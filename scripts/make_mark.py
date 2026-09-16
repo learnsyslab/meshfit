@@ -236,7 +236,7 @@ def main(argv=None) -> int:
                     default=Path(__file__).resolve().parents[1] / "docs" / "img")
     ap.add_argument("--size", type=int, default=320)
     ap.add_argument("--frames", type=int, default=44)
-    ap.add_argument("--lead", type=int, default=12,
+    ap.add_argument("--lead", type=int, default=6,
                     help="frames to rest on the offset pose, before it moves")
     ap.add_argument("--hold", type=int, default=14, help="frames to rest on the fit")
     ap.add_argument("--ms", type=int, default=45, help="per-frame duration")
