@@ -236,7 +236,7 @@ def main(argv=None) -> int:
     ap.add_argument("--size", type=int, default=320)
     ap.add_argument("--frames", type=int, default=44)
     ap.add_argument("--hold", type=int, default=18, help="frames to rest on the fit")
-    ap.add_argument("--ms", type=int, default=40, help="per-frame duration")
+    ap.add_argument("--ms", type=int, default=70, help="per-frame duration")
     ap.add_argument("--no-links", action="store_true")
     ap.add_argument("--marks", action="store_true",
                     help="also emit the standalone mark, without the wordmark")
