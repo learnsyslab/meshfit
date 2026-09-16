@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# local test fixtures built by scripts/make_test_data.py -- large and derived
+test_data/
+out/
+
+# comparison against an unpublished third-party pipeline -- stays local
+scripts/run_embody.py
+scripts/compare.py

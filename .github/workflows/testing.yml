@@ -1,0 +1,23 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # The solver, refinement and visualisation logic is pure numpy/scipy and
+      # runs here. Blender and RoMa are injected into the loop rather than
+      # imported by it, so CI exercises the logic with stubs and skips the two
+      # modules that need a GPU or a checkpoint.
+      # embreex because trimesh's ray backend is what lifts matches to 3D; the
+      # pure-python fallback needs rtree, which is not here either.
+      - run: pip install numpy scipy trimesh embreex pillow pytest
+      - run: python -m pytest tests -q

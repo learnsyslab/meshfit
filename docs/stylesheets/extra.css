@@ -1,0 +1,87 @@
+/* Tables of numbers are the point of several pages; keep them compact and
+   right-aligned so columns can be scanned rather than read. */
+.md-typeset table:not([class]) td:not(:first-child),
+.md-typeset table:not([class]) th:not(:first-child) {
+  text-align: right;
+}
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+}
+
+/* The header logo sits on the primary colour, not on the page background, so
+   it swaps with the SCHEME rather than to match the page. Material renders it
+   as a plain <img>, and `content` is the only hook available on one. */
+[data-md-color-scheme="slate"] .md-header__button.md-logo img {
+  content: url("../img/favicon_light.png");
+}
+
+/* ---- interactive example scenes (docs/javascripts/scene-viewer.js) ---- */
+
+.scene-viewer {
+  position: relative;
+  margin: 1.2rem 0;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 4px;
+  background: var(--md-code-bg-color);
+  overflow: hidden;
+}
+
+.scene-viewer__canvas {
+  width: 100%;
+  height: 420px;
+}
+
+.scene-viewer__canvas canvas {
+  display: block;
+  cursor: grab;
+}
+
+.scene-viewer__canvas canvas:active {
+  cursor: grabbing;
+}
+
+.scene-viewer__status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.scene-viewer__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.35rem 0.7rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  font-size: 0.65rem;
+  color: var(--md-default-fg-color--light);
+}
+
+.scene-viewer__controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+}
+
+.scene-viewer__controls button {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.scene-viewer__controls button:hover {
+  color: var(--md-accent-fg-color);
+}
+
+@media screen and (max-width: 44.98em) {
+  .scene-viewer__canvas { height: 300px; }
+}

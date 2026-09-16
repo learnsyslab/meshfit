@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "meshfit"
+version = "0.1.0"
+description = "Place a generated mesh into an observed scene: metric, upright, world-frame pose from RGB + masks + a gravity-aligned point cloud."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Jim Yun-Jin Li" }]
+requires-python = ">=3.11"
+keywords = ["3d", "pose-estimation", "real2sim", "mesh-alignment", "robotics"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+
+# Deliberately minimal: only what meshfit itself imports. romatch brings
+# torch, torchvision, kornia and opencv transitively -- re-declaring them
+# here would just create a second place for versions to drift.
+dependencies = [
+    "numpy",
+    "scipy",      # cKDTree (icp init), optimize.least_squares (lm polish)
+    "trimesh",    # mesh load, and the raycaster used to lift keypoints to 3D
+    "embreex",    # trimesh.ray backend: ~4M rays/s, vs ~13k/s for rtree
+    "rtree",      # fallback raycaster when embree is unavailable
+    "pillow",     # RoMa's match() takes PIL Images
+    "romatch",    # the matcher; pulls torch/torchvision/kornia/opencv
+    # Renderer. bpy embeds CPython, so each release is ABI-locked to one
+    # interpreter: 4.2-5.0.1 are cp311, 5.1+ are cp313. Capped at <5.1 to
+    # stay on 3.11 and match digital-sister's posealign env.
+    "bpy>=4.5,<5.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "viser",       # interactive 3D alignment viewer
+    "matplotlib",  # overlay figures
+    "mkdocs-material",     # docs site
+    "mkdocstrings[python]", # API reference from docstrings
+]
+
+[project.scripts]
+meshfit = "meshfit.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/learnsyslab/meshfit"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/meshfit"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+# Broad `except Exception` is deliberate in three places and each has a comment
+# saying why: a mesh whose visual data cannot be read must fall back to flat
+# colour, and a degenerate RANSAC sample must be skipped rather than crash the
+# fit. Logging them would print thousands of lines per run.
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+
+[tool.pytest.ini_options]
+# src layout: make the package importable without an editable install
+pythonpath = ["src"]
+testpaths = ["tests"]

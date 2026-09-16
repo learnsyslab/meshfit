@@ -1,0 +1,24 @@
+# Development environment ONLY. meshfit itself is a plain pip package -- this
+# file exists so contributors get a reproducible Python 3.11 with the GPU and
+# Blender stacks, which no system python here provides.
+#
+#   pixi run install-dev     # once
+#   pixi run test
+[workspace]
+name = "meshfit"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+# Kept deliberately thin: pixi supplies the interpreter, pip resolves the rest.
+# romatch drags a large transitive graph (torch, wandb, opencv, timm); letting
+# pip own it keeps the lock small and avoids re-solving on every dependency bump.
+[dependencies]
+python = "3.11.*"
+pip = "*"
+
+[tasks]
+install-dev = { cmd = "pip install -e '.[dev]' --extra-index-url https://download.pytorch.org/whl/cu128" }
+test = { cmd = "pytest" }
+lint = { cmd = "ruff check src tests scripts" }
+docs = { cmd = "mkdocs serve" }
+docs-build = { cmd = "mkdocs build --strict" }

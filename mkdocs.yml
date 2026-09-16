@@ -1,0 +1,102 @@
+site_name: meshfit
+site_description: Metric pose recovery for generated meshes — position, per-axis scale and orientation from RGB, masks and a point cloud
+site_url: https://learnsyslab.github.io/meshfit/
+repo_name: learnsyslab/meshfit
+repo_url: https://github.com/learnsyslab/meshfit
+
+docs_dir: docs
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: img/favicon.png
+  favicon: img/favicon.png
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - navigation.footer
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Get Started:
+    - Installation: get-started/installation.md
+    - Quick Start: get-started/quick-start.md
+  - User Guide:
+    - user-guide/index.md
+    - Input contract: user-guide/inputs.md
+    - Initialisation: user-guide/initialisation.md
+    - Refinement: user-guide/refinement.md
+    - Polish: user-guide/polish.md
+    - Tilt and plausibility: user-guide/tilt.md
+    - Symmetry and confidence: user-guide/symmetry.md
+    - Output schema: user-guide/output.md
+    - Visualisation: user-guide/visualisation.md
+  - Examples: examples/index.md
+  - API Reference: api/index.md
+  - Cite: cite.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            heading_level: 3
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - path: javascripts/scene-viewer.js
+    type: module
+    defer: true
+
+extra_css:
+  - stylesheets/extra.css
