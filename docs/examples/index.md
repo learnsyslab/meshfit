@@ -75,9 +75,3 @@ polish    : params=7, reproj 26.70 -> 8.58 px, accepted=True, iou -> 0.8695
 
 The yaw ring did the hard part, going from no pose at all to 0.819, and polish
 took it to 0.870. Refinement was rejected by the silhouette gate.
-
-!!! tip "The mask must be the whole object"
-    Segmenting this souvenir with the prompt `"windmill"` returned only the
-    sail blades, 27k pixels. `"miniature windmill house"` returned the whole
-    figurine, 94k. The first gave a final IoU of 0.378; the second, 0.870. The
-    mask defines what meshfit is fitting to.
