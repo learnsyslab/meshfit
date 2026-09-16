@@ -7,7 +7,7 @@ generator exported.
 The order matters and is not cosmetic. UV textures first, vertex colours
 second, flat grey last: a feature matcher works on what it can see, and baking
 a 4096px texture down to per-vertex colours discards exactly the
-high-frequency detail it keys on. On a real TRELLIS mesh that difference was
+high-frequency detail it keys on. On a real TRELLIS.2 mesh that difference was
 two orders of magnitude in match count.
 """
 
@@ -22,7 +22,7 @@ def apply_appearance(bpy, data, mesh, renderer) -> None:
     UV textures first, vertex colours second, plain grey last. The order is not
     cosmetic: a feature matcher works on what it can see, and baking a 4096px
     texture down to per-vertex colours throws away exactly the high-frequency
-    detail it keys on. On a real TRELLIS mesh that difference was two orders of
+    detail it keys on. On a real TRELLIS.2 mesh that difference was two orders of
     magnitude in match count.
     """
     material = bpy.data.materials.new("meshfit_mat")

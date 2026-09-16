@@ -21,7 +21,7 @@ meshfit recovers the metric pose of a mesh in a real scene (position, per-axis s
 
 Generated meshes are the motivating case, since they arrive wrong in *proportion* as well as pose, which is why scale is per-axis rather than a single number. 
 
-A pose-aware backend ([SAM 3D](https://github.com/facebookresearch/sam-3d-objects), [RecGen](https://github.com/TRI-ML/recgen)) passes its estimate as `init` and meshfit refines it. Without one ([TRELLIS](https://github.com/microsoft/TRELLIS), or a CAD part off disk) meshfit finds the orientation by search. Same code path either way.
+A pose-aware backend ([SAM 3D](https://github.com/facebookresearch/sam-3d-objects), [RecGen](https://github.com/TRI-ML/recgen)) passes its estimate as `init` and meshfit refines it. Without one (TRELLIS.2, [TRELLIS](https://github.com/microsoft/TRELLIS), or a CAD part off disk) meshfit finds the orientation by search. Same code path either way.
 
 ```python
 import meshfit
@@ -44,7 +44,7 @@ result.confidence.ambiguous     # is this object's yaw determinable at all?
 
 ## Features
 
-- **Generator-agnostic.** Nothing in the package branches on which model made the mesh. TRELLIS, SAM 3D and recgen differ only in whether they pass `init`
+- **Generator-agnostic.** Nothing in the package branches on which model made the mesh. TRELLIS.2, SAM 3D and recgen differ only in whether they pass `init`
 - **Metric.** Scale and distance come from measured depth, not from appearance, which fixes only a viewing ray
 - **Upright when it should be.** The constrained fit pins pitch and roll to zero; a free-rotation fit is adopted only when the lean is large *and* renders better
 - **Anisotropic scale.** Generated meshes get proportions wrong, so scale is per-canonical-axis, solved jointly with pose
@@ -76,9 +76,9 @@ Silhouette IoU against the observed mask, single view, on meshes from three diff
 | toy figurine | SAM 3D | 0.441 | **0.912** |
 | toilet paper roll | SAM 3D | 0.331 | **0.855** |
 | drawer unit | recgen | 0.863 | **0.927** |
-| windmill souvenir | TRELLIS | *(no pose)* | **0.870** |
+| windmill souvenir | TRELLIS.2 | *(no pose)* | **0.870** |
 
-TRELLIS is pose-blind, so the windmill had no generator pose and meshfit found the orientation by search. -->
+TRELLIS.2 is pose-blind, so the windmill had no generator pose and meshfit found the orientation by search. -->
 
 ## Citation
 

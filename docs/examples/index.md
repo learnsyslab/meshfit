@@ -56,10 +56,10 @@ polish    : params=7, reproj 4.88 -> 2.72 px, accepted=True, iou -> 0.9227
 
 <div class="scene-viewer" data-src="../scenes/recgen_drawer_1.glb"></div>
 
-## Pose-blind: TRELLIS
+## Pose-blind: TRELLIS.2
 
-TRELLIS returns a canonical mesh and nothing else. There is no `init.json`, so
-meshfit searches.
+TRELLIS.2 returns a canonical mesh and nothing else. There is no `init.json`,
+so meshfit searches.
 
 ```bash
 meshfit fit test_data/trellis_windmill --overlay out/windmill.png --debug

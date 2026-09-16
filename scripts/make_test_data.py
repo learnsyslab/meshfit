@@ -209,15 +209,15 @@ def _views_from_lwg(record: dict) -> list[View]:
 
 
 # ---------------------------------------------------------------------------
-# TRELLIS (pose-blind)
+# TRELLIS.2 (pose-blind)
 # ---------------------------------------------------------------------------
 
 
 def from_trellis(glb: Path, view_npz: Path, mask_npy: Path, out: Path,
                  label: str = "") -> Path:
-    """A TRELLIS mesh plus a reconstruction of the photo it came from.
+    """A TRELLIS.2 mesh plus a reconstruction of the photo it came from.
 
-    TRELLIS is pose-blind: it returns a canonical mesh and nothing else. So
+    TRELLIS.2 is pose-blind: it returns a canonical mesh and nothing else. So
     unlike the other converters there is no `init.json` here, and meshfit has
     to find the pose itself -- this is the case that exercises `from_search`.
 
@@ -240,10 +240,10 @@ def from_trellis(glb: Path, view_npz: Path, mask_npy: Path, out: Path,
 
     return save_case(
         out, mesh, observation,
-        meta={"canonical_up": "+Y",          # glTF convention; TRELLIS follows it
-              "backend": "trellis",
+        meta={"canonical_up": "+Y",          # glTF convention; TRELLIS.2 follows it
+              "backend": "trellis2",
               "pose_aware": False,
-              "source": f"trellis:{glb.stem}",
+              "source": f"trellis2:{glb.stem}",
               "label": label or glb.stem,
               "note": "no generator pose -- meshfit must search for the yaw"},
     )
