@@ -167,7 +167,8 @@ def wordmark(text: str, cap_px: int, colour, tracking: float = 0.06):
 
 
 def lockup(out: Path, text: str, theme: Theme, cap_px: int, mark_px: int,
-           frames: int, hold: int, ms: int, links: bool, animate: bool) -> None:
+           frames: int, lead: int, hold: int, ms: int, links: bool,
+           animate: bool) -> None:
     """Mark on the left, wordmark on the right, on transparency.
 
     Transparent so one file works on a light README, a dark README and both
@@ -192,7 +193,7 @@ def lockup(out: Path, text: str, theme: Theme, cap_px: int, mark_px: int,
 
     seq = [compose(frame_rgba(i / (frames - 1), mark_px, theme, links))
            for i in range(frames)]
-    seq += [seq[-1]] * hold
+    seq = [seq[0]] * lead + seq + [seq[-1]] * hold
     flat = []
     for f in seq:                      # GIF has no alpha blending, only a key
         bg = Image.new("RGB", f.size, theme.bg)
@@ -215,10 +216,10 @@ def frame_rgba(t: float, size: int, theme: Theme, links: bool) -> Image.Image:
     return Image.fromarray(arr.astype(np.uint8), "RGBA")
 
 
-def build(out: Path, size: int, frames: int, hold: int, ms: int, theme: Theme,
-          links: bool) -> None:
+def build(out: Path, size: int, frames: int, lead: int, hold: int, ms: int,
+          theme: Theme, links: bool) -> None:
     seq = [draw_frame(i / (frames - 1), size, theme, links) for i in range(frames)]
-    seq += [seq[-1]] * hold                              # rest on the answer
+    seq = [seq[0]] * lead + seq + [seq[-1]] * hold       # rest either side
     out.parent.mkdir(parents=True, exist_ok=True)
     seq[0].save(out, save_all=True, append_images=seq[1:], duration=ms, loop=0,
                 optimize=True, disposal=2)
@@ -235,8 +236,10 @@ def main(argv=None) -> int:
                     default=Path(__file__).resolve().parents[1] / "docs" / "img")
     ap.add_argument("--size", type=int, default=320)
     ap.add_argument("--frames", type=int, default=44)
-    ap.add_argument("--hold", type=int, default=18, help="frames to rest on the fit")
-    ap.add_argument("--ms", type=int, default=70, help="per-frame duration")
+    ap.add_argument("--lead", type=int, default=12,
+                    help="frames to rest on the offset pose, before it moves")
+    ap.add_argument("--hold", type=int, default=14, help="frames to rest on the fit")
+    ap.add_argument("--ms", type=int, default=45, help="per-frame duration")
     ap.add_argument("--no-links", action="store_true")
     ap.add_argument("--marks", action="store_true",
                     help="also emit the standalone mark, without the wordmark")
@@ -247,8 +250,10 @@ def main(argv=None) -> int:
 
     links = not args.no_links
     if args.marks:          # standalone mark, without the wordmark beside it
-        build(args.out / "mark.gif", args.size, args.frames, args.hold, args.ms, LIGHT, links)
-        build(args.out / "mark_dark.gif", args.size, args.frames, args.hold, args.ms, DARK, links)
+        build(args.out / "mark.gif", args.size, args.frames, args.lead, args.hold,
+              args.ms, LIGHT, links)
+        build(args.out / "mark_dark.gif", args.size, args.frames, args.lead, args.hold,
+              args.ms, DARK, links)
 
     # favicon: the settled mark, square, no wordmark -- at 32px a word is a smudge
     draw_favicon(256, LIGHT).save(args.out / "favicon.png")
@@ -260,7 +265,7 @@ def main(argv=None) -> int:
                                  ("logo.gif", LIGHT, True),
                                  ("logo_dark.gif", DARK, True)):
         lockup(args.out / name, args.text, theme, args.cap, args.mark,
-               args.frames, args.hold, args.ms, links, animate)
+               args.frames, args.lead, args.hold, args.ms, links, animate)
     return 0
 
 
