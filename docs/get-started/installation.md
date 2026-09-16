@@ -1,12 +1,20 @@
 # Installation
 
 ```bash
-pip install meshfit
+pip install git+https://github.com/learnsyslab/meshfit.git
 ```
 
-That pulls numpy, scipy, trimesh, embreex, romatch (which brings torch) and
-bpy. No compiler and no source builds: RoMa's CUDA `local_corr` extension is
-optional and off by default, and Blender ships as a wheel.
+meshfit is not on PyPI yet, so pip builds it from the repository. Everything it
+depends on is on PyPI, so this is a normal install: numpy, scipy, trimesh,
+embreex, romatch (which brings torch) and bpy. No compiler and no source
+builds beyond meshfit itself, since RoMa's CUDA `local_corr` extension is
+optional and off by default and Blender ships as a wheel.
+
+Pin a version by adding a tag, which is what to do in anything reproducible:
+
+```bash
+pip install "meshfit @ git+https://github.com/learnsyslab/meshfit.git@v0.1.0"
+```
 
 !!! note "Python 3.11"
     `bpy` embeds its own CPython, so meshfit pins `bpy<5.1` and needs Python

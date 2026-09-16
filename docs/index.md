@@ -61,7 +61,7 @@ different generators.
 ## Install
 
 ```bash
-pip install meshfit
+pip install git+https://github.com/learnsyslab/meshfit.git
 ```
 
 ## Next

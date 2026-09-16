@@ -54,8 +54,10 @@ result.confidence.ambiguous     # is this object's yaw determinable at all?
 ## Installation
 
 ```bash
-pip install meshfit
+pip install git+https://github.com/learnsyslab/meshfit.git
 ```
+
+Not on PyPI yet, so it installs from the repository.
 
 Developer install ([pixi](https://pixi.sh/) recommended):
 
