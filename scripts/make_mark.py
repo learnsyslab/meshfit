@@ -38,9 +38,15 @@ DARK = Theme(bg=(24, 27, 31), point=(238, 242, 246), mesh=(210, 216, 222),
 
 def targets(size: int) -> np.ndarray:
     """The measured points: a deliberately scalene triangle, so the fit has a
-    unique answer rather than a symmetric family of them."""
+    unique answer rather than a symmetric family of them.
+
+    The radius is set by the *starting* pose, not this one: at 1.52x and turned
+    146 degrees, a vertex swings about 1.75 radii from the centre, and anything
+    past the frame is clipped to a flat edge that reads as the wordmark
+    covering it.
+    """
     c = size / 2
-    r = size * 0.30
+    r = size * 0.255
     angles = (-90.0, 28.0, 152.0)
     return np.array([[c + r * math.cos(math.radians(a)),
                       c + r * math.sin(math.radians(a))] for a in angles])
@@ -276,7 +282,7 @@ def main(argv=None) -> int:
                     help="also emit the standalone mark, without the wordmark")
     ap.add_argument("--text", default="MESHFIT")
     ap.add_argument("--cap", type=int, default=150, help="wordmark cap height, px")
-    ap.add_argument("--mark", type=int, default=190, help="mark size in the lockup, px")
+    ap.add_argument("--mark", type=int, default=222, help="mark size in the lockup, px")
     args = ap.parse_args(argv)
 
     links = not args.no_links
