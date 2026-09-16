@@ -119,9 +119,11 @@ function load(container) {
       view.bar.appendChild(reset);
     },
     (event) => {
+      // Capped: a gzipped response reports decompressed bytes against a
+      // compressed Content-Length, which walks past 100%.
       if (event.lengthComputable) {
-        view.status.textContent =
-          `loading ${Math.round((event.loaded / event.total) * 100)}%`;
+        const done = Math.min(1, event.loaded / event.total);
+        view.status.textContent = `loading ${Math.round(done * 100)}%`;
       }
     },
     () => { view.status.textContent = 'could not load this scene'; },
