@@ -46,10 +46,14 @@ def targets(size: int) -> np.ndarray:
                       c + r * math.sin(math.radians(a))] for a in angles])
 
 
-def ease_out(t: float, power: float = 3.0) -> float:
-    """Fast then settling -- a fit converges, it does not arrive at constant
-    speed."""
-    return 1.0 - (1.0 - t) ** power
+def ease(t: float) -> float:
+    """Slow off the offset pose, quick through the middle, soft landing.
+
+    Smootherstep. A pure ease-out is truer to how a solver converges, but it
+    spends its first frames moving fastest, so the starting pose -- the whole
+    point of the animation -- is gone before the eye finds it.
+    """
+    return t * t * t * (t * (6.0 * t - 15.0) + 10.0)
 
 
 def pose_at(t: float, pts: np.ndarray, size: int,
@@ -59,7 +63,7 @@ def pose_at(t: float, pts: np.ndarray, size: int,
     A similarity: rotation, uniform scale, translation -- the same three
     degrees of freedom the solver recovers, interpolated to zero.
     """
-    e = ease_out(t)
+    e = ease(t)
     centre = pts.mean(axis=0)
     angle = math.radians(turn_deg) * (1.0 - e)
     scale = 1.0 + (grow - 1.0) * (1.0 - e)
@@ -102,7 +106,7 @@ def draw_frame(t: float, size: int, theme: Theme, show_links: bool) -> Image.Ima
 
     # Where it started, FADING as the fit converges. Held at constant strength
     # it reads as a second triangle rather than as history.
-    ghost_alpha = int(90 * max(0.0, 1.0 - ease_out(t) * 1.15))
+    ghost_alpha = int(90 * max(0.0, 1.0 - ease(t) * 1.15))
     if ghost_alpha > 4:
         start = pose_at(0.0, targets(size), size, -146.0, 1.52, (0.06, -0.05)) * SS
         d.line([tuple(p) for p in start] + [tuple(start[0])],
@@ -236,8 +240,8 @@ def main(argv=None) -> int:
                     default=Path(__file__).resolve().parents[1] / "docs" / "img")
     ap.add_argument("--size", type=int, default=320)
     ap.add_argument("--frames", type=int, default=44)
-    ap.add_argument("--lead", type=int, default=6,
-                    help="frames to rest on the offset pose, before it moves")
+    ap.add_argument("--lead", type=int, default=0,
+                    help="frames to freeze on the offset pose before it moves")
     ap.add_argument("--hold", type=int, default=14, help="frames to rest on the fit")
     ap.add_argument("--ms", type=int, default=45, help="per-frame duration")
     ap.add_argument("--no-links", action="store_true")
