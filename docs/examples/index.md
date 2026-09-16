@@ -34,9 +34,9 @@ The controller leans against a paper roll at about 55°, so the free hypothesis
 wins and polish runs in its 9-parameter form. SAM 3D's own estimate had 56.7°,
 and an independent pipeline on the same scene arrived at 62.06°.
 
-## Pose-aware, different convention: recgen
+## Pose-aware: RecGen
 
-recgen reports its pose in a **normalised camera frame**, so it composes
+RecGen reports its pose in a **normalised camera frame**, so it composes
 through two more transforms before meshfit can use it:
 
 ```
@@ -44,7 +44,7 @@ canonical --(pose)--> ncam --(cam2ncam⁻¹)--> camera --(cam2world)--> world
 ```
 
 Since `cam2ncam` is a uniform scale plus translation, the chain collapses into
-a single similarity. recgen's textured export is also written in glTF's +Y-up
+a single similarity. RecGen's textured export is also written in glTF's +Y-up
 convention while the pose was estimated against a +Z-up mesh. That is recorded
 as `canonical_up` rather than fixed by rewriting vertices.
 

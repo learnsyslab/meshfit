@@ -30,7 +30,7 @@ result = meshfit.fit(
     mesh,                       # trimesh, in the generator's canonical frame
     observation,                # views (RGB, mask, K, cam2world, pointmap) + object points
     canonical_up="+Y",          # glTF convention
-    init=generator_pose,        # optional: SAM 3D / recgen already had an opinion
+    init=generator_pose,        # optional: SAM 3D / RecGen already had an opinion
 )
 
 result.pose.matrix()            # T_world_canonical (rigid)
@@ -44,7 +44,7 @@ result.confidence.ambiguous     # is this object's yaw determinable at all?
 
 ## Features
 
-- **Generator-agnostic.** Nothing in the package branches on which model made the mesh. TRELLIS.2, SAM 3D and recgen differ only in whether they pass `init`
+- **Generator-agnostic.** Nothing in the package branches on which model made the mesh. TRELLIS.2, SAM 3D and RecGen differ only in whether they pass `init`
 - **Metric.** Scale and distance come from measured depth, not from appearance, which fixes only a viewing ray
 - **Upright when it should be.** The constrained fit pins pitch and roll to zero; a free-rotation fit is adopted only when the lean is large *and* renders better
 - **Anisotropic scale.** Generated meshes get proportions wrong, so scale is per-canonical-axis, solved jointly with pose
@@ -77,7 +77,7 @@ Silhouette IoU against the observed mask, single view, on meshes from three diff
 | game controller | SAM 3D | 0.201 | **0.951** |
 | toy figurine | SAM 3D | 0.441 | **0.912** |
 | toilet paper roll | SAM 3D | 0.331 | **0.855** |
-| drawer unit | recgen | 0.863 | **0.927** |
+| drawer unit | RecGen | 0.863 | **0.927** |
 | windmill souvenir | TRELLIS.2 | *(no pose)* | **0.870** |
 
 TRELLIS.2 is pose-blind, so the windmill had no generator pose and meshfit found the orientation by search. -->

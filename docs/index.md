@@ -55,7 +55,7 @@ different generators.
 | game controller | SAM 3D | 0.201 | **0.951** |
 | toy figurine | SAM 3D | 0.441 | **0.912** |
 | toilet paper roll | SAM 3D | 0.331 | **0.855** |
-| drawer unit | recgen | 0.863 | **0.927** |
+| drawer unit | RecGen | 0.863 | **0.927** |
 | windmill souvenir | TRELLIS.2 | *no pose* | **0.870** | -->
 
 ## Install
