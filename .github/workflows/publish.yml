@@ -1,0 +1,55 @@
+name: Publish
+
+# Cutting a GitHub release publishes that version to PyPI. Run it by hand to
+# rehearse against TestPyPI first -- a version number can never be re-uploaded,
+# so a botched release burns it.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install build twine
+      - run: python -m build
+      # Catches a broken README before PyPI renders it, and a tag that does not
+      # match the version in pyproject.toml.
+      - run: python -m twine check dist/*
+      - if: github.event_name == 'release'
+        run: |
+          version=$(python -c "import tomllib,pathlib; \
+            print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          tag=${GITHUB_REF_NAME#v}
+          test "$version" = "$tag" || {
+            echo "tag $tag does not match pyproject version $version"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    # Trusted publishing: PyPI verifies this workflow's OIDC token, so there is
+    # no API token to store or rotate.
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: PyPI
+        if: github.event_name == 'release'
+        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: TestPyPI
+        if: github.event_name == 'workflow_dispatch'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

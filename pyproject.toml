@@ -53,6 +53,11 @@ Homepage = "https://github.com/learnsyslab/meshfit"
 [tool.hatch.build.targets.wheel]
 packages = ["src/meshfit"]
 
+# Without this the sdist carries docs/, and the animated logo and the example
+# scenes are 9 MB of it. Source and tests are what a source distribution owes.
+[tool.hatch.build.targets.sdist]
+include = ["src/meshfit", "tests", "README.md", "LICENSE", "pyproject.toml"]
+
 [tool.ruff]
 line-length = 100
 src = ["src", "tests", "scripts"]
