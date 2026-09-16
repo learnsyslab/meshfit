@@ -21,7 +21,7 @@ meshfit recovers the metric pose of a mesh in a real scene (position, per-axis s
 
 Generated meshes are the motivating case, since they arrive wrong in *proportion* as well as pose, which is why scale is per-axis rather than a single number. 
 
-A pose-aware backend ([SAM 3D](https://github.com/facebookresearch/sam-3d-objects), [RecGen](https://github.com/TRI-ML/recgen)) passes its estimate as `init` and meshfit refines it. Without one (TRELLIS.2, [TRELLIS](https://github.com/microsoft/TRELLIS), or a CAD part off disk) meshfit finds the orientation by search. Same code path either way.
+A pose-aware backend ([SAM 3D](https://github.com/facebookresearch/sam-3d-objects), [RecGen](https://github.com/TRI-ML/recgen)) passes its estimate as `init` and meshfit refines it. Without one ([TRELLIS.2](https://github.com/microsoft/trellis.2), [TRELLIS](https://github.com/microsoft/TRELLIS), or a CAD part) meshfit finds the orientation by search. Same code path either way.
 
 ```python
 import meshfit
