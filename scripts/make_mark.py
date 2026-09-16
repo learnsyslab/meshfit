@@ -177,26 +177,53 @@ def lockup(out: Path, text: str, theme: Theme, cap_px: int, mark_px: int,
 
     Transparent so one file works on a light README, a dark README and both
     docs themes without a background fighting the page.
+
+    Everything is laid out against the *settled* triangle rather than the frame
+    it is drawn in. That frame has to hold the starting pose, which is oversized
+    and offset, so its centre sits well above the triangle that comes to rest in
+    it, and centring the frame left the mark riding 16px high of the word.
     """
     word = wordmark(text, cap_px, theme.mesh)
+    settled = frame_rgba(1.0, mark_px, theme, links)
+    x0, y0, x1, y1 = settled.getbbox()          # where the triangle ends up
+    ink_w, ink_h = x1 - x0, y1 - y0
+
     gap = int(mark_px * 0.30)
-    height = max(mark_px, word.height)
-    width = mark_px + gap + word.width
+    height = max(ink_h, word.height)
+    mark_at = (-x0, (height - ink_h) // 2 - y0)  # ink origin, not frame origin
+    word_at = (ink_w + gap, (height - word.height) // 2)
     pad = int(height * 0.12)
+    roomy = (word_at[0] + word.width + 2 * mark_px, height + 2 * mark_px)
+    origin = (mark_px, mark_px)
 
     def compose(mark_rgba: Image.Image) -> Image.Image:
-        canvas = Image.new("RGBA", (width + 2 * pad, height + 2 * pad), (0, 0, 0, 0))
-        canvas.alpha_composite(mark_rgba, (pad, pad + (height - mark_px) // 2))
-        canvas.alpha_composite(word, (pad + mark_px + gap, pad + (height - word.height) // 2))
+        canvas = Image.new("RGBA", roomy, (0, 0, 0, 0))
+        canvas.alpha_composite(mark_rgba, (origin[0] + mark_at[0], origin[1] + mark_at[1]))
+        canvas.alpha_composite(word, (origin[0] + word_at[0], origin[1] + word_at[1]))
         return canvas
 
-    if not animate:
-        compose(frame_rgba(1.0, mark_px, theme, links)).save(out)
-        print(f"  {out}  ({width + 2 * pad}x{height + 2 * pad})")
-        return
-
+    # Rendered even for the still, so both files get the same crop and can be
+    # swapped for one another.
     seq = [compose(frame_rgba(i / (frames - 1), mark_px, theme, links))
            for i in range(frames)]
+
+    # Margins measured from the settled logo and applied evenly, but never
+    # tighter than the motion: the triangle swings outside where it lands, and
+    # a frame clipped at the edge is worse than a little extra air.
+    still = seq[-1].getbbox()
+    moving = [f.getbbox() for f in seq]
+    reach = (min(b[0] for b in moving), min(b[1] for b in moving),
+             max(b[2] for b in moving), max(b[3] for b in moving))
+    mx = pad + max(still[0] - reach[0], reach[2] - still[2])
+    my = pad + max(still[1] - reach[1], reach[3] - still[3])
+    box = (still[0] - mx, still[1] - my, still[2] + mx, still[3] + my)
+    seq = [f.crop(box) for f in seq]
+
+    if not animate:
+        seq[-1].save(out)
+        print(f"  {out}  ({seq[-1].size[0]}x{seq[-1].size[1]})")
+        return
+
     seq = [seq[0]] * lead + seq + [seq[-1]] * hold
     flat = []
     for f in seq:                      # GIF has no alpha blending, only a key
