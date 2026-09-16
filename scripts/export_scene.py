@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import struct
 import sys
 from pathlib import Path
 
@@ -55,17 +56,29 @@ def to_linear(colors: np.ndarray) -> np.ndarray:
     return np.rint(lin * 255).astype(np.uint8)
 
 
-def fix_material(mesh):
-    """Make the material render as the diffuse surface it is.
+def matte(glb: bytes, *, roughness: float = 0.75) -> bytes:
+    """Make every material in an exported GLB the diffuse surface it should be.
 
-    trimesh writes no `metallicFactor`, and glTF's default for it is 1.0 -- a
-    mirror. The texture then reads as a dark smear in any PBR viewer.
+    Two defaults work against us. A textured mesh gets no `metallicFactor`, and
+    glTF's default for that is 1.0 -- a mirror, which renders the texture as a
+    dark smear. A vertex-coloured mesh gets trimesh's own material instead,
+    with `roughnessFactor` 0, which is a gloss so sharp the specular highlight
+    covers the object in white speckle.
+
+    Patched here rather than on the mesh because a vertex-coloured trimesh has
+    no material to set: the exporter invents one.
     """
-    material = getattr(mesh.visual, "material", None)
-    if material is not None and hasattr(material, "metallicFactor"):
-        material.metallicFactor = 0.0
-        material.roughnessFactor = 0.7
-    return mesh
+    length, kind = struct.unpack("<II", glb[12:20])
+    doc = json.loads(glb[20:20 + length])
+    for material in doc.get("materials", []):
+        pbr = material.setdefault("pbrMetallicRoughness", {})
+        pbr["metallicFactor"] = 0.0
+        pbr["roughnessFactor"] = roughness
+    payload = json.dumps(doc, separators=(",", ":")).encode()
+    payload += b" " * (-len(payload) % 4)          # chunks are 4-byte aligned
+    body = glb[20 + length:]
+    return (glb[:8] + struct.pack("<I", 20 + len(payload) + len(body))
+            + struct.pack("<II", len(payload), kind) + payload + body)
 
 
 def lighten(mesh, max_faces: int, max_texture: int):
@@ -91,7 +104,7 @@ def lighten(mesh, max_faces: int, max_texture: int):
         scale = max_texture / max(image.size)
         mesh.visual.material.baseColorTexture = image.resize(
             (max(1, int(image.width * scale)), max(1, int(image.height * scale))))
-    return fix_material(mesh)
+    return mesh
 
 
 def posed_mesh(mesh, pose: Pose):
@@ -154,7 +167,7 @@ def export(name: str, *, max_points: int, max_faces: int, max_texture: int,
 
     OUT.mkdir(parents=True, exist_ok=True)
     out = OUT / f"{name}.glb"
-    out.write_bytes(scene.export(file_type="glb"))
+    out.write_bytes(matte(scene.export(file_type="glb")))
     print(f"{name:32s} {len(points):>7,} points  "
           f"{'init' if case.init is not None else '    '}  "
           f"{out.stat().st_size / 1e6:5.2f} MB")
@@ -165,7 +178,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("cases", nargs="*", help="case names under test_data/")
     parser.add_argument("--max-points", type=int, default=60000)
-    parser.add_argument("--max-faces", type=int, default=60000)
+    parser.add_argument("--max-faces", type=int, default=150000)
     parser.add_argument("--max-texture", type=int, default=512)
     parser.add_argument("--margin", type=float, default=2.5,
                         help="half-width of the kept region, in object extents")

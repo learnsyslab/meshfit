@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const POINT_SIZE = 0.004;          // metres
 const FRAME_DISTANCE = 2.6;        // in object radii
@@ -37,12 +38,17 @@ function build(container) {
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.NeutralToneMapping;
   canvas.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x404050, 2.0));
-  const key = new THREE.DirectionalLight(0xffffff, 1.6);
+  // Image-based lighting rather than a couple of lamps. A scanned mesh has its
+  // shading painted into the texture already, and two hard lights on top of
+  // that turn every ridge into a dark smear.
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const key = new THREE.DirectionalLight(0xffffff, 0.8);
   key.position.set(1, 2, 1.5);
   scene.add(key);
 
